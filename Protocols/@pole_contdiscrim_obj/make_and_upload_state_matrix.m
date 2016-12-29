@@ -181,7 +181,7 @@ switch action
            
            stm = [stm ;
                %Cin Cout    Tup   Tim       Dou Aou  (Dou is bitmask format)
-               b     b      101   .01       etid        0  ; ... % trigger camera and EPHUS; 10 ms later jump to state 101 to give trial num bit code.
+               b     b      101   .01       cmid+etid   0  ; ... % trigger camera and EPHUS; 10 ms later jump to state 101 to give trial num bit code.
                b+1   b+1    b+2   sptm      pvid        0  ; ... % wait for poles to descend, wait duration of sampling period.
                onlk2 onlk2  tmout aptm      pvid        0  ; ... % wait for lick for aptm seconds.
                b+3   b+3    b+4   wvtm      pvid+wvid   0  ; ... % reward tone + water - HIT

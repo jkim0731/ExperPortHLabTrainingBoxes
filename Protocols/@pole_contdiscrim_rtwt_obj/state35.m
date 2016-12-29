@@ -36,11 +36,11 @@ n_started_trials.value = n_started_trials + 1;
 
 
 if ismember(SessionType, {'Discrim_DHO','Detection_SP', 'Detection_SP_leaveUp'})
-        disp(['Starting move...'])     
+%         disp(['Starting move...'])     
 %         tic
         MotorsSection(obj,'move_next_side'); % chooses and *moves* to next side
 %         error('TESTING!')
-        disp(['Move finished. Ready for trial ' int2str(value(n_started_trials))]) 
+%         disp(['Move finished. Ready for trial ' int2str(value(n_started_trials))]) 
 %         toc        
 else
     % nothing

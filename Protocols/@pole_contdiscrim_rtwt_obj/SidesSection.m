@@ -54,6 +54,12 @@ function [x, y] = SidesSection(obj, action, x, y)
       
       % Give read-only access to AnalysisSection.m:
       SoloFunctionAddVars('AnalysisSection', 'ro_args', 'previous_sides');
+
+      
+      SoloParamHandle(obj, 'previous_types', 'value', []); % type of the trial (fake trials). 1 normal go, 2 normal no-go, 3 protraction-go, 4 protraction-nogo, 5 retraction-go, 6 retraction-nogo
+      SoloFunctionAddVars('make_and_upload_state_matrix', 'ro_args', 'previous_types');
+      SoloFunctionAddVars('MotorsSection', 'ro_args', 'previous_types');      
+      SoloFunctionAddVars('AnalysisSection', 'ro_args', 'previous_types');      
       
         % ........................
       %min probability used for autotrainer slide   
@@ -91,17 +97,24 @@ function [x, y] = SidesSection(obj, action, x, y)
       next_row(y);
       % Prob of choosing left as correct side
       NumeditParam(obj, 'NoGoProb', 0.5, x, y); 
+      next_row(y);
+      
+      NumeditParam(obj, 'FakeProb', 0, x, y);
+      next_row(y);
+      
+      NumeditParam(obj, 'ProtractProb', 0, x, y);
+      
+      
       next_row(y, 1);
-
       SubheaderParam(obj, 'sidestitle', 'Go trial probability', x, y);
       next_row(y);
 
       pos = get(gcf, 'Position');
       SoloParamHandle(obj, 'myaxes', 'saveable', 0, 'value', axes);
       set(value(myaxes), 'Units', 'pixels');
-      set(value(myaxes), 'Position', [90 pos(4)-140 pos(3)-130 100]);
-      set(value(myaxes), 'YTick', [1 2], 'YLim', [0.5 2.5], 'YTickLabel', ...
-                        {'Go', 'No-go'});
+      set(value(myaxes), 'Position', [100 pos(4)-150 pos(3)-130 120]);
+      set(value(myaxes), 'YTick', [1 2 3 4 5 6], 'YLim', [0.5 6.5], 'YTickLabel', ...
+                        {'Go', 'No-go', 'G-Prot', 'NG-Prot', 'G-Ret', 'NG-Ret'});
       NumeditParam(obj, 'ntrials', 100, x, y, ...
                    'position', [5 pos(4)-100 40 40], 'labelpos', 'top', ...
                    'TooltipString', 'How many trials to show in plot');
@@ -189,6 +202,7 @@ function [x, y] = SidesSection(obj, action, x, y)
       % Is autotrainer on? if so, that means only nogo allowed
       if (value(autotraining) == 1) 
           next_side = 'l';
+          next_type = 1; % 1 & 2 normal right and left. 3 & 4 protraction right and left. 5 & 6 retraction right and left.
           disp('AUTOTRAINER ON -- only nogos.');
       else
           % If MaxSame doesn't apply yet, choose at random
@@ -207,20 +221,31 @@ function [x, y] = SidesSection(obj, action, x, y)
                 if rand(1)<=NoGoProb, next_side = 'l'; else next_side = 'r'; end;
              end;
           end;
+          
+          if strcmp(next_side, 'r')
+              next_type = 1;
+          else
+              next_type = 2;
+          end
+          if rand(1) <= FakeProb
+              if rand(1) <= ProtractProb
+                    next_type = next_type + 2; % 3 & 4
+              else
+                    next_type = next_type + 4; % 5 & 6                 
+              end
+          end
       end
-      
 
     %  session_type = SessionTypeSection(obj,'get_session_type'); 
       switch SessionType
-          
           case {'Licking','Pole-conditioning'}
             next_side = 'r'; % Make it always the go-trial position, so mouse doesn't have to unlearn anything.
+            next_type = 1;
       end
 
       previous_sides(n_started_trials+1) = next_side;
+      previous_types(n_started_trials+1) = next_type;
 
-
-      
     case 'get_next_side',   % --------- CASE GET_NEXT_SIDE ------
       if isempty(previous_sides),
          error('Don''t have next side chosen! Did you run choose_next_side?');
@@ -234,24 +259,18 @@ function [x, y] = SidesSection(obj, action, x, y)
       if isempty(previous_sides), return; end;
 
       ps = value(previous_sides);
-      if ps(end)=='l', 
-         hb = line(length(previous_sides), 2, 'Parent', value(myaxes));
-      else                         
-         hb = line(length(previous_sides), 1, 'Parent', value(myaxes));
-      end;
+      pt = value(previous_types);
+
+      hb = line(length(previous_sides), pt(end), 'Parent', value(myaxes));
       set(hb, 'Color', 'b', 'Marker', '.', 'LineStyle', 'none');
       
       xgreen = find(hit_history);
-      lefts  = find(previous_sides(xgreen) == 'l');
-      rghts  = find(previous_sides(xgreen) == 'r');
-      ygreen = zeros(size(xgreen)); ygreen(lefts) = 2; ygreen(rghts) = 1;
+      ygreen = previous_types(xgreen);
       hg = line(xgreen, ygreen, 'Parent', value(myaxes));
       set(hg, 'Color', 'g', 'Marker', '.', 'LineStyle', 'none'); 
 
       xred  = find(~hit_history);
-      lefts = find(previous_sides(xred) == 'l');
-      rghts = find(previous_sides(xred) == 'r');
-      yred = zeros(size(xred)); yred(lefts) = 2; yred(rghts) = 1;
+      yred = previous_types(xred);
       hr = line(xred, yred, 'Parent', value(myaxes));
       set(hr, 'Color', 'r', 'Marker', '.', 'LineStyle', 'none'); 
 

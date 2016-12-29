@@ -75,7 +75,7 @@ switch action
         SoloParamHandle(obj, 'motor_max_position', 'value', 180000);  
         SoloParamHandle(obj, 'trial_ready_times', 'value', 0);
 
-        MenuParam(obj, 'motor_show', {'view', 'hide'}, 'view', x, y, 'label', 'Motor Control', 'TooltipString', 'Control motors');
+        MenuParam(obj, 'motor_show', {'view', 'hide'}, 'hide', x, y, 'label', 'Motor Control', 'TooltipString', 'Control motors');
         set_callback(motor_show, {mfilename,'hide_show'});
 
         next_row(y);
@@ -251,8 +251,8 @@ switch action
     
         
     case 'motors_home',     %modified by ZG 10/1/11
-%         disp(motors);
-%         disp(value(motor_num));
+        disp(motors);
+        disp(value(motor_num));
         move_home(motors, value(motor_num));
         return;
 

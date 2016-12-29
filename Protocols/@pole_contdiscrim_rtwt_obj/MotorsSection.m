@@ -43,19 +43,31 @@ switch action
 
     case 'init',   % ------------ CASE INIT ----------------
         
-        if strcmp(motors_properties.type,'@FakeZaberTCD1000')
-            motors = FakeZaberTCD1000;
+        if strcmp(motors_properties.type,'@FakeZaberAMCB2')
+            motors = FakeZaberAMCB2;
         else
-            motors = ZaberTCD1000(motors_properties.port);
+            disp(['Real Motor!!!']);
+            motors = ZaberAMCB2(motors_properties.port);
         end
-       
+
+%         disp('trying to open motors');
         serial_open(motors);
+        disp('motors are open');
+%         disp(motors);
 
         % Save the figure and the position in the figure where we are
         % going to start adding GUI elements:
         SoloParamHandle(obj, 'my_gui_info', 'value', [x y gcf]); next_row(y,1.5);
-        SoloParamHandle(obj, 'motor_num', 'value', 0);
-
+%        SoloParamHandle(obj, 'motor_num', 'value', 0);
+        
+        %added by ZG 10/1/11
+        SoloParamHandle(obj, 'motor_num', 'value', 1);
+        SoloParamHandle(obj, 'lateral_motor_num', 'value', 2);
+        
+        % List of pole positions
+        SoloParamHandle(obj, 'previous_pole_positions', 'value', []);        
+                
+        
         % Set limits in microsteps for actuator. Range of actuator is greater than range of
         % our Del-Tron sliders, so must limit to prevent damage.  This limit is also coded into Zaber
         % TCD1000 firmware, but exists here to keep GUI in range. If a command outside this range (0-value)
@@ -74,7 +86,7 @@ switch action
         
         % ---  Make new window for motor configuration
         SoloParamHandle(obj, 'motorfig', 'saveable', 0);
-        motorfig.value = figure('Position', [3 500 400 150], 'Menubar', 'none',...
+        motorfig.value = figure('Position', [3 750 400 250], 'Menubar', 'none',...
             'Toolbar', 'none','Name','Motor Control','NumberTitle','off');
 
         x = 1; y = 1;
@@ -104,16 +116,6 @@ switch action
         set_callback(motors_reset, {mfilename, 'motors_reset'});
         next_row(y, 2);
         
-%         ToggleParam(obj, 'multi_go_position', 0, x, y, 'label', 'Multi Go Positions',...
-%             'TooltipString', 'One of the above 4 positions chosen randomly for every go trial');
-%         %set_callback(multi_go_position, 
-%         next_row(y);
-%         
-%         NumeditParam(obj, 'go1',0, x, y, 'position', [x y 50 20], 'label','', 'labelfraction', 0.05);
-%         NumeditParam(obj, 'go2',1.05e4, x, y, 'position', [x+50 y 50 20],'label','', 'labelfraction', 0.05); 
-%         NumeditParam(obj, 'go3',3.15e4, x, y, 'position', [x+100 y 50 20],'label','',  'labelfraction', 0.05);
-%         NumeditParam(obj, 'go4', 4.2e4, x, y, 'position', [x+150 y 50 20],'label','',  'labelfraction',0.05);
-                
         next_column(x); y = 1;
         
         PushButtonParam(obj, 'read_positions', x, y, 'label', 'Read position');
@@ -127,101 +129,139 @@ switch action
         next_row(y);
         SubheaderParam(obj, 'title', 'Read/set position', x, y);
 
+        
+        
+        
+        %--------------- extreme positions for the multi-pole task --------------------------------
         next_row(y);
-        EditParam(obj, 'nogo_position', '180000', x, y, 'label', ...
-            'No-go position','TooltipString','No-go trial position in microsteps.');
+        NumeditParam(obj, 'no_pole_position_ant', 180000, x, y, 'label', ...
+            '"No" ant position','TooltipString','Far no trial position in microsteps.');
         
         next_row(y);
-       % NumeditParam(obj, 'go_position', 0, x, y, 'label', ...
-       %     'Go position','TooltipString','Go trial position in microsteps.');
-        EditParam(obj, 'go_position', '(3e4,9e4)', x, y, 'label', ...
-            'Go position','TooltipString','Go trial position in microsteps.');
+        NumeditParam(obj, 'no_pole_position_pos', 100001, x, y, 'label', ...
+            '"No" pos position','TooltipString','Near no trial position in microsteps.');
+        
+        next_row(y);
+        NumeditParam(obj, 'yes_pole_position_ant', 100000, x, y, 'label', ...
+            '"Yes" ant position','TooltipString','Far yes trial position in microsteps.');        
+        
+        next_row(y);
+        NumeditParam(obj, 'yes_pole_position_pos', 20000, x, y, 'label', ...
+            '"Yes" pos position','TooltipString','Near yes trial position in microsteps.');
+% 
+%         next_row(y);
+%         NumeditParam(obj, 'num_of_pole_position', 5, x, y, 'label', ...
+%             'Pole positions','TooltipString','Number of Yes/No pole position');
+% 
+%         % switch between 2 pole task and multi-pole
+%         next_row(y);
+%         ToggleParam(obj, 'multi_go_position', 0, x, y, 'label', 'Multi Go Positions',...
+%             'TooltipString', 'Multiple pole position will be used.');
+        %-----------------------------------------------------------
+        next_row(y);
+        NumeditParam(obj, 'lateral_pole_position', 170000, x, y, 'label', ...
+            'lateral position of the pole')
+        
+        next_row(y);
+        NumeditParam(obj, 'motor_move_time', 2, x, y, 'label', ...
+            'motor move time','TooltipString','set up time for motor to move.');
 
-    
+        next_row(y)
+        PushButtonParam(obj, 'read_lateral_positions', x, y, 'label', 'Read lateral position');
+        set_callback(read_lateral_positions, {mfilename, 'read_lateral_positions'});
+
+        next_row(y);
+        NumeditParam(obj, 'lateral_motor_position', 50000, x, y, 'label', ...
+            'lateral_motor_position','TooltipString','Absolute position in microsteps of motor.');
+        set_callback(lateral_motor_position, {mfilename, 'lateral_motor_position'});
+
         next_row(y);
         SubheaderParam(obj, 'title', 'Trial position', x, y);
         
-        % bump on top
-        next_row(y);
-        NumeditParam(obj, 'inreach_moveby', 0, x, y, 'label', ...
-            'In-reach move by','TooltipString','How much to move once pole is in reach in microsteps.');
-        SoloParamHandle(obj, 'motor_inreach_moved', 'value', 0);
-                
-        % For debugging motor
-        SoloParamhandle(obj, 'motor_move_time', 'value', 0);
-
 
         MotorsSection(obj,'hide_show');
         MotorsSection(obj,'read_positions');
+        MotorsSection(obj,'read_lateral_positions');
         
         x = parentfig_x; y = parentfig_y;
         set(0,'CurrentFigure',value(myfig));
         return;
 
     case 'move_next_side', % --------- CASE MOVE_NEXT_SIDE -----
+       
         next_side = SidesSection(obj,'get_next_side');
+       
+
+            if next_side == 'r'
+                next_pole_position = value(round(rand*(yes_pole_position_ant - yes_pole_position_pos)+yes_pole_position_pos));
+            elseif next_side == 'l'
+                next_pole_position = value(round(rand*(no_pole_position_ant - no_pole_position_pos)+no_pole_position_pos));
+            else
+                error('un-recognized type for next_side');
+            end
+
+            half_point = round(value(no_pole_position_pos+yes_pole_position_ant)/2);
          
-        % pull position and process if range
-        goPos = value(go_position);
-        nogoPos = value(nogo_position);
+            
+            if (previous_types(end) == 1) | (previous_types(end) == 2)
+                lateral_next_pole_position = lateral_pole_position;                
+            else
+                lateral_next_pole_position = 0; % pole out
+            end
+            lateral_half_point = round(value(lateral_pole_position)/2);
         
-        % cam be a range specified by (a,b) where a is min b is max
-        if (~isnumeric(goPos)) % assume format is correct!
-          comIdx = find(goPos == ',');
-          minValue = str2num(goPos(2:comIdx-1));
-          maxValue = str2num(goPos(comIdx+1:end-1));
-          
-          goPos = minValue + round((maxValue-minValue)*rand(1));
+
+        tic
+        move_absolute_sequence(motors,{half_point,next_pole_position},value(motor_num));
+        move_absolute_sequence(motors,{lateral_half_point,value(lateral_next_pole_position)},value(lateral_motor_num));
+        movetime = toc;
+        if movetime<value(motor_move_time) % Should make this min-ITI a SoloParamHandle
+            pause( value(motor_move_time)-movetime);
         end
 
+        MotorsSection(obj,'read_positions');        
+        trial_ready_times.value = clock;  
         
-        if (~isnumeric(nogoPos)) % assume format is correct!
-          comIdx = find(nogoPos == ',');
-          minValue = str2num(nogoPos(2:comIdx-1));
-          maxValue = str2num(nogoPos(comIdx+1:end-1));
-          
-          nogoPos = minValue + round((maxValue-minValue)*rand(1));
-        end        
-        % Manually start pedestal at mid-point (90000).
-        if next_side == 'r'
-              position = goPos;
-        elseif next_side == 'l'
-              position = nogoPos;
-        else
-            error('Invalid next side.')
-        end
+        previous_pole_positions(n_started_trials) = next_pole_position;        
         
-        halfpoint = abs(round((nogoPos-goPos)/2)) + min(nogoPos,goPos);
-%         if Solo_Try_Catch_Flag == 1
-%             try
-%                 move_absolute_sequence(motors,{90000,position},value(right_motor_num));
-%             catch
-%                 pause(1)
-%                 warning('Error in move_absolute_sequence, forcing state 35...');
-%                 SMControlSection(obj,'force_state_35');
-%                 return
-%             end
-%         else
-             tic
-             move_absolute_sequence(motors,{halfpoint,position},value(motor_num));
-             movetime = toc;
-             motor_move_time.value = movetime;
-             if movetime<1.9 % Should make this min-ITI a SoloParamHandle
-                 pause(1.9-movetime); %4
-             end
-%         end
-        
-         
-        previous_sides(n_started_trials+1) = next_side;
-        MotorsSection(obj,'read_positions');
-        
-%         trial_ready_times.value = datestr(now);
-        trial_ready_times.value = clock;
-        
+
         return;
         
-    case 'motors_home',
-        move_home(motors);
+
+    
+    case 'get_previous_pole_position',   % --------- CASE get_next_pole_position ------
+        if isempty(value(previous_pole_positions))
+            x = nan;
+        else
+            x = previous_pole_positions(length(previous_pole_positions));
+        end
+        return;
+
+    case 'get_all_previous_pole_positions',   % --------- CASE get_next_pole_position ------
+        x = value(previous_pole_positions);
+        return;
+
+    case 'get_yes_pole_position_easy'
+        x = value(yes_pole_position_ant);
+        return
+
+    case 'get_no_pole_position_easy'
+        x = value(no_pole_position_pos);
+        return
+
+    case 'get_num_of_pole_position'
+       
+            x = 1;
+       
+        return
+        
+        
+    
+        
+    case 'motors_home',     %modified by ZG 10/1/11
+%         disp(motors);
+%         disp(value(motor_num));
+        move_home(motors, value(motor_num));
         return;
 
     case 'serial_open',
@@ -234,10 +274,10 @@ switch action
         global motors_properties;
         global motors; 
         
-        if strcmp(motors_properties.type,'@FakeZaberTCD1000')
-            motors = FakeZaberTCD1000;
+        if strcmp(motors_properties.type,'@FakeZaberAMCB2')
+            motors = FakeZaberAMCB2;
         else
-            motors = ZaberTCD1000;
+            motors = ZaberAMCB2;
         end
         
         serial_open(motors);
@@ -265,12 +305,30 @@ switch action
             move_absolute(motors,position,value(motor_num));
         end
         return;
-
+        
+     case 'lateral_motor_position',
+        position = value(lateral_motor_position);
+        if position > value(motor_max_position) | position < 0
+            p = get_position(motors,value(lateral_motor_num));
+            lateral_motor_position.value = p;
+        else
+            move_absolute(motors,position,value(lateral_motor_num));
+        end
+        return;
+        
     case 'read_positions'
         p = get_position(motors,value(motor_num));
         motor_position.value = p;
         return;
 
+     case 'read_lateral_positions'
+        p = get_position(motors,value(lateral_motor_num));
+        lateral_motor_position.value = p;
+        return;
+        
+
+        
+        
         % --------- CASE HIDE_SHOW ---------------------------------
 
     case 'hide_show'
@@ -300,30 +358,6 @@ switch action
 
         % Restore the current figure:
         figure(currfig);
-        return;
-        
-    case 'update' 
-        
-        % check for state 41 -- if 41 and user wants to move pole, do so.
-        state = GetParam('rpbox','state','value');
-        if (state == 41)
-            if (value(motor_inreach_moved) < 3)  
-                motor_inreach_moved.value = value(motor_inreach_moved) + 1;
-                if (value(motor_inreach_moved) == 3)
-                    moveBy = value(inreach_moveby);
-                    if (moveBy ~= 0)
-                        finalPos = value(motor_position) + moveBy;
-                        if (finalPos > 180000) ; finalPos = 180000; end
-                        if (finalPos < 0) ; finalPos = 0; end
-                    
-                        move_absolute(motors,finalPos,value(motor_num));
-                    end               
-                end
-            end
-        else
-            motor_inreach_moved.value = 0;
-        end
-        
         return;
 end
 

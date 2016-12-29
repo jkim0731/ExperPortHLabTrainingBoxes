@@ -1,4 +1,4 @@
-function [obj] = pole_detect_spobj(name)
+function [obj] = pole_cont_discrim_obj(name)
     
 % -------- BEGIN Magic code that all protocol objects must have ---
 %
@@ -57,7 +57,7 @@ set(value(myfig), 'Name', name, 'Tag', name, ...
 % Ok, at this point we have one SoloParamHandle, myfig 
 
 % Let's put the figure where we want it and give it a reasonable size:
-set(value(myfig), 'Position', [485   100   450   630]);
+set(value(myfig), 'Position', [485   100   450   750]);
 
 % Let's declare some globals that everybody is likely to want to know about.
 % Number of finished trials:
@@ -84,6 +84,11 @@ DeclareGlobals(obj, 'ro_args', {'n_done_trials', 'n_started_trials', ...
 % Let RewardsSection, the part that parses what happened at the end of
 % a trial, write to hit_history:
 SoloFunctionAddVars('RewardsSection', 'rw_args', 'hit_history');
+
+
+% for sending an e-mail
+global mailsent
+mailsent = 0;
 
 % ----------
 

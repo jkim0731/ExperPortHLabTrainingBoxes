@@ -29,7 +29,7 @@
 
 % CDB 9-Feb-06
 
-function [out] = pole_contdiscrim_(varargin)
+function [out] = pole_contdiscrim_rtwt_(varargin)
 
 global exper
 

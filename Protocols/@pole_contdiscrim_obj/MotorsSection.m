@@ -75,7 +75,7 @@ switch action
         SoloParamHandle(obj, 'motor_max_position', 'value', 180000);  
         SoloParamHandle(obj, 'trial_ready_times', 'value', 0);
 
-        MenuParam(obj, 'motor_show', {'view', 'hide'}, 'view', x, y, 'label', 'Motor Control', 'TooltipString', 'Control motors');
+        MenuParam(obj, 'motor_show', {'view', 'hide'}, 'hide', x, y, 'label', 'Motor Control', 'TooltipString', 'Control motors');
         set_callback(motor_show, {mfilename,'hide_show'});
 
         next_row(y);
@@ -134,11 +134,11 @@ switch action
         
         %--------------- extreme positions for the multi-pole task --------------------------------
         next_row(y);
-        NumeditParam(obj, 'no_pole_position_ant', 0, x, y, 'label', ...
+        NumeditParam(obj, 'no_pole_position_ant', 180000, x, y, 'label', ...
             '"No" ant position','TooltipString','Far no trial position in microsteps.');
         
         next_row(y);
-        NumeditParam(obj, 'no_pole_position_pos', 0, x, y, 'label', ...
+        NumeditParam(obj, 'no_pole_position_pos', 100001, x, y, 'label', ...
             '"No" pos position','TooltipString','Near no trial position in microsteps.');
         
         next_row(y);
@@ -146,7 +146,7 @@ switch action
             '"Yes" ant position','TooltipString','Far yes trial position in microsteps.');        
         
         next_row(y);
-        NumeditParam(obj, 'yes_pole_position_pos', 150000, x, y, 'label', ...
+        NumeditParam(obj, 'yes_pole_position_pos', 20000, x, y, 'label', ...
             '"Yes" pos position','TooltipString','Near yes trial position in microsteps.');
 % 
 %         next_row(y);
@@ -162,7 +162,7 @@ switch action
         
         
         next_row(y);
-        NumeditParam(obj, 'motor_move_time', 0, x, y, 'label', ...
+        NumeditParam(obj, 'motor_move_time', 2, x, y, 'label', ...
             'motor move time','TooltipString','set up time for motor to move.');
 
         next_row(y)

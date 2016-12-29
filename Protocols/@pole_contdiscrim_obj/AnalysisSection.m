@@ -43,7 +43,7 @@ switch action
         SoloParamHandle(obj, 'my_gui_info', 'value', [x y gcf]); next_row(y,1.5);
 
 
-        MenuParam(obj, 'analysis_show', {'view', 'hide'}, 'view', x, y, 'label', 'Analysis', 'TooltipString', 'Online behavior analysis');
+        MenuParam(obj, 'analysis_show', {'view', 'hide'}, 'hide', x, y, 'label', 'Analysis', 'TooltipString', 'Online behavior analysis');
         set_callback(analysis_show, {mfilename,'hide_show'});
 
         next_row(y);
