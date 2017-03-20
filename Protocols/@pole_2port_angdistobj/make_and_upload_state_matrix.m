@@ -65,7 +65,7 @@ switch action
    slid = 2^5; % Signal line for signaling trial numbers and fiducial marks. % to scanbox 2016/07/05 JK + video starting point 2016/08/29
    rcid = 2^3; % Reward cue ID (sound), used for bitcodes to servo 2016/05/23 JK.
    
-   puffid = 0; % Airpuff valve ID. DISABLED
+   puffid = 0; % Airpuff valve ID. 
    
    rwvtm = RWaterValveTime; % Defined in ValvesSection.m.  
    lwvtm = LWaterValveTime; % Defined in ValvesSection.m.  
@@ -231,10 +231,10 @@ switch action
            prep_t = prep_t - 0.01 - 0.077; % 2 ms bit, 5 ms interbit, 11 bits = 77 ms = .077 s
            
            % Adjust prepause based on bitcode for sending angles
-           prep_t = prep_t - 0.32; % 20 ms bit, 20 ms interbit, 8 bits = 320 ms = .32 s
+           prep_t = max([prep_t - 0.32, 0.001]); % 20 ms bit, 20 ms interbit, 8 bits = 320 ms = .32 s
 
            % Adjust postpause based on bitcode for sending 90 degrees angle
-           postp_t = postp_t - 0.32; % 20 ms bit, 20 ms interbit, 8 bits = 320 ms = .32 s           
+           postp_t = max([postp_t - 0.32, 0.001]); % 20 ms bit, 20 ms interbit, 8 bits = 320 ms = .32 s
 
                 % Alexis 9-2-14 DECLARE A WRONG
                 pps = sPoTP; % post-punish state default is post trial pause
@@ -271,7 +271,7 @@ switch action
                %LinSt   LoutSt   RinSt    RoutSt   TimeupSt Time      Dou      Aou  (Dou is bitmask format)
                % line b (sBC = b = 40 @ 41st row of the final stm)
                sBC      sBC      sBC      sBC      101      .01       slid       0; ... % sBC: bitcode. slid will evoke TTL0 signal to scanbox. concurrent with durid evoking up event of TTL1 (resulting in event type 3 in scanbox) 
-               sPrTP    sPrTP    sPrTP    sPrTP    sPMS     prep_t    pzscid     0; ... % sPrPT: pretrial pause / pzcuid for piezo buzzer 2016/05/29 JK
+               sPrTP    sPrTP    sPrTP    sPrTP    sPMS     prep_t    pzscid     0; ... % sPrPT: pretrial pause / pzscid for piezo buzzer 2016/05/29 JK
                onLickS  onLickS  onLickS  onLickS  sPrAP    pr_t+sp_t pvid       0; ... % sPMS: pole move & sample period % onLickS = sPMS @ line 235
                onlickL  onlickL  onlickR  onlickR  sLoMi    ap_t      pvid       0; ... % sPrAP: preanswer pause
                sLoMi    sLoMi    sLoMi    sLoMi    sPoTP    0.001     0          0; ... % sLoMi: log miss/ignore

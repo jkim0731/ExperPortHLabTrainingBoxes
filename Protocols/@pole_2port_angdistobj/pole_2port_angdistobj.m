@@ -56,7 +56,7 @@ set(value(myfig), 'Name', name, 'Tag', name, ...
 % Ok, at this point we have one SoloParamHandle, myfig 
 
 % Let's put the figure where we want it and give it a reasonable size:
-set(value(myfig), 'Position', [1450   50   500   720]);
+set(value(myfig), 'Position', [1450   50   500   800]);
 
 % Let's declare some globals that everybody is likely to want to know about.
 % Number of finished trials:
@@ -128,9 +128,6 @@ x = 1; y = 1;                     % Initial position on main GUI window
 % Online analysis:
 [x, y] = AnalysisSection(obj, 'init', x, y);
 
-% Control of motors:
-[x, y] = MotorsSection(obj, 'init', x, y);
-
 next_column(x); y = 1;
 % Section that sets ITI times, etc. 
 [x, y] = TimesSection(obj, 'init', x, y);
@@ -147,7 +144,8 @@ next_column(x); y = 1;
 % side history. 
 [x, y] = SidesSection(obj, 'init', x, y);
 
-
+% Control of motors:
+[x, y] = MotorsSection(obj, 'init', x, y);
 
 figpos = get(gcf, 'Position');
 HeaderParam(obj, 'prot_title', 'Whisker Discrimination', ...

@@ -18,7 +18,9 @@
 function [] = state35(obj)
 
 GetSoloFunctionArgs;
+
 judp('SEND', 6610, '68.181.114.170', [int8('Action0101[Stop Record()]:'), int8(num2str(double(n_done_trials)+1))])
+judp('SEND', 7000, '68.181.112.192', [int8('L0') 10]); pause(1); % laser blanking, and pausing for extra 1 sec
 % SoloFunctionAddVars('state35', 'rw_args', 'n_done_trials', ...
 %         'ro_args', 'trial_finished_actions');
 % SoloParamhandle(obj, 'iti', 'value', 0); % for debugging motor move time
@@ -53,9 +55,10 @@ n_started_trials.value = n_started_trials + 1;
 trialnumstr = strcat('M',num2str(double(n_started_trials)));
 judp('SEND', 7000, '68.181.112.192', [int8(trialnumstr) 10])
 % trialnumstr = strcat('S',num2str(double(n_started_trials)));
-% judp('SEND', 7000, '68.181.114.170', [int8(trialnumstr) 10])           
+       
 disp(['trial num ',num2str(double(n_started_trials)), ' started'])
 
+judp('SEND', 7000, '68.181.112.192', [int8('L1') 10]); % re-open the laser
 judp('SEND', 6610, '68.181.114.170', [int8('Action0101[create new sequence and start recording()]:'), int8(num2str(double(n_started_trials)))])
 
 % Testing motor movement time

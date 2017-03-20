@@ -204,6 +204,7 @@ switch action
         
         next_absolute_angle = 90;
         SoloFunctionAddVars('make_and_upload_state_matrix', 'ro_args', {'next_absolute_angle'}); 
+        MotorsSection(obj, 'move_next_side');
         
         return;
 
@@ -224,14 +225,12 @@ switch action
                 end
                 next_pole_dist = value(dist_wo_dstr);                
                 ap_offset_factor_dist = 1; % The offset factor for determining how far the pole should go to posterior direction, depending on the combination of angle and the position
-                ap_offset_factor_distdown = 0; % The offset factor for determining how far the pole should go to posterior direction, depending on the distance in downward pole angle.
+
             elseif strcmp(TaskTarget,'RadialDistance')
                 if next_side == 'r'
                     next_pole_dist = value(far_dist);
-                    ap_offset_factor_distdown = 1;
                 elseif next_side == 'l'
                     next_pole_dist = value(near_dist);
-                    ap_offset_factor_distdown = 0;
                 else
                     error('un-recognized type of choice (left or right)');
                 end
@@ -446,8 +445,9 @@ switch action
         ap_offset_factor_angle = (next_absolute_angle - angle_offset - next_pole_angle)/(180 - 2 * next_pole_angle);
 %         ap_offset_dist = determined up above;        
         apjitter = (rand)* value(apjitter_max);
+        disp(['jitter = ',num2str(apjitter)])
         ap_position = value(ap_set_position);         
-        ap_move = floor(ap_position - apjitter) + farup_offset * ap_offset_factor_angle + (nearup_offset - farup_offset) * ap_offset_factor_angle * ap_offset_factor_dist; % Changed from + apjitter to - apjitter 
+        ap_move = floor(ap_position - apjitter) + fardown_offset * (1-ap_offset_factor_dist) + farup_offset * ap_offset_factor_angle + (nearup_offset - farup_offset) * ap_offset_factor_angle * ap_offset_factor_dist; % Changed from + apjitter to - apjitter 
         % when the pole representation direction is changed from lateral to caudal 2016/07/02 JK
         % Changed to have 2 factors to compensate for touch angle
         % differences. offsets should be within 0~1 2017/02/23 JK. 
@@ -461,7 +461,7 @@ switch action
             pause( value(motor_move_time)-movetime);
         end
         
-%         disp(['ap_move = ', num2str(ap_move)]);
+        disp(['ap_move = ', num2str(ap_move)]);
 %         disp(['radial distance = ', num2str(next_pole_dist)]);
 %         disp(['ap_offset_factor_dist = ', num2str(ap_offset_factor_dist)]);        
 
@@ -471,9 +471,9 @@ switch action
 
         SoloFunctionAddVars('make_and_upload_state_matrix', 'ro_args', {'next_absolute_angle'}); % Moving pole angle is done with state matrix via arduino
         
-        previous_pole_distances(n_started_trials) = next_pole_dist;
-        previous_pole_ap_positions(n_started_trials) = ap_move;
-        previous_pole_angles(n_started_trials) = next_absolute_angle;
+        previous_pole_distances(n_started_trials+1) = next_pole_dist;
+        previous_pole_ap_positions(n_started_trials+1) = ap_move;
+        previous_pole_angles(n_started_trials+1) = next_absolute_angle;
 
         return;
         
