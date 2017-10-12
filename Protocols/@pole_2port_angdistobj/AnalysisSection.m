@@ -62,7 +62,7 @@ switch action
 
         % ---  Make new window for online analysis
         SoloParamHandle(obj, 'analysisfig', 'saveable', 0);
-        analysisfig.value = figure('Position', [1450 820 400 330], 'Menubar', 'none',...
+        analysisfig.value = figure('Position', [1450 900 400 200], 'Menubar', 'none',...
             'Toolbar', 'none','Name','Analysis','NumberTitle','off');
 
         x = 1; y = 1;

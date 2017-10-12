@@ -48,7 +48,10 @@ function [x, y] = SavingSection(obj, action, x, y)
 %       set_callback(loaddata, {mfilename, 'loaddata'}); next_row(y);     
 %       PushButtonParam(obj, 'savedata', x, y, 'label', 'Save Data');
 %       set_callback(savedata, {mfilename, 'savedata'}); next_row(y, 1.5);   
-      EditParam(obj, 'MouseName', 'AH0000', x, y); next_row(y, 1.5);
+      EditParam(obj, 'MouseName', 'JK000', x, y); next_row(y);
+      EditParam(obj, 'SessionName', 'S00', x, y);
+      
+      next_row(y, 1.5);
             
       PushButtonParam(obj, 'loadsets', x, y, 'label', 'Load Settings');
       set_callback(loadsets, {mfilename, 'loadsets'});

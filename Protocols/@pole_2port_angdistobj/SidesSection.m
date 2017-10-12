@@ -321,38 +321,35 @@ function [x, y] = SidesSection(obj, action, x, y)
              else
                 % Haven't reached MaxSame limits yet, choose at random:
                 if rand(1)<=lpp, next_side = 'l'; else next_side = 'r'; end;
-
-                
-                % --- Regardless of training mode, distractor presentation will be
-                % determined solely by LeftDistractorProb. 
-                if strcmp(Distractor,'On') 
-                    % If MaxSameDstr doesn't apply yet, choose at random
-                    if strcmp(value(MaxSameDstr), 'Inf') || MaxSameDstr > n_started_trials,
-                       if rand(1)<=ldp, next_dstr = 'c'; else next_dstr = 'f'; end;
-                    else 
-                       % MaxSameDstr applies, check for its rules:
-                       % If there's been a string of MaxSameDstr guys all the same, force change:
-                       if all(previous_sides(n_started_trials-MaxSameDstr+2:n_started_trials) == ...
-                              previous_sides(n_started_trials)) && ...
-                              previous_sides(n_started_trials) == next_side && ...
-                              all(previous_dstrs(n_started_trials-MaxSameDstr+1:n_started_trials) == ...
-                              previous_dstrs(n_started_trials))
-                          if previous_dstrs(n_started_trials)=='c', next_dstr = 'f';
-                          else                                       next_dstr = 'c';
-                          end;
-                       else
-                          % Haven't reached MaxSame limits yet, choose at random:
-                          if rand(1) <= ldp; next_dstr = 'c'; else next_dstr = 'f'; end
-                       end;
-                    end;
-                elseif strcmp(Distractor, 'Continuous')
-                    next_dstr = 'a';
-                else next_dstr = 'n';
-                end
-             end;
-          end;
+             end
+          end
        end
 
+                
+    % --- Regardless of training mode, distractor presentation will be
+    % determined solely by LeftDistractorProb. 
+    if strcmp(Distractor,'On') 
+        % If MaxSameDstr doesn't apply yet, choose at random
+        compare_dstrs = previous_dstrs(find(previous_sides == next_side));
+        if strcmp(value(MaxSameDstr), 'Inf') || MaxSameDstr > length(find(previous_sides == next_side))
+           if rand(1)<=ldp, next_dstr = 'c'; else next_dstr = 'f'; end;
+        else 
+           % MaxSameDstr applies, check for its rules:
+           % If there's been a string of MaxSameDstr guys all the same, force change:
+           if all(compare_dstrs(end-MaxSameDstr+1:end) == compare_dstrs(end))
+               sprintf('MaxSameDstr')                           
+              if previous_dstrs(n_started_trials)=='c', next_dstr = 'f';
+              else                                       next_dstr = 'c';
+              end;
+           else
+              % Haven't reached MaxSame limits yet, choose at random:
+              if rand(1) <= ldp; next_dstr = 'c'; else next_dstr = 'f'; end
+           end;
+        end;
+    elseif strcmp(Distractor, 'Continuous')
+        next_dstr = 'a';
+    else next_dstr = 'n';
+    end
       
     %  session_type = SessionTypeSection(obj,'get_session_type'); 
       switch SessionType

@@ -152,8 +152,12 @@ switch action
                b+2   b+1  b+1  b+1   35  rwvtm  wvRid   0  ; ... % licked right -- reward right
                b+2   b+2  b+1  b+2   35  lwvtm  wvLid   0  ; ... % licked left -- reward left
                ];
-
-           
+        
+       case 'Piezo stimulation' % 10 Hz 2 sec for now 2017/10/03
+           stm = [stm;
+               b    b   b   b   b+1 5    0       0   ; ... % 5 sec baseline
+               b+1  b+1 b+1 b+1 35 2   slid+durid    0   ]; % ephus stimulation by slid, TTL0 by slid and TTL1 by durid for TPM
+               
 %        case 'Beam-Break-Indicator'
 %            stm = [stm ;
 %                b+1   b  b+2 b    35  999  0      0  ; ...
@@ -185,16 +189,16 @@ switch action
            sp_t = SamplingPeriodTime;
            eto_t = max(.01,ExtraITIOnError);
            pr_t = PoleRetractTime;
-           pa_t = PreAnswerTime;
+%            pa_t = PreAnswerTime;
            prep_t = PreTrialPauseTime;
            postp_t = PostTrialPauseTime;
            rc_t = RewardCueTime;
            rcoll_t = RewardCollectTime;
-           lpt_t = LickportTravelTime;
+%            lpt_t = LickportTravelTime;
            
 %            puff_t = AirpuffTime;
            
-           wdraw_t = 0.3; % how long to stay in withdraw state and allow its detection
+%            wdraw_t = 0.3; % how long to stay in withdraw state and allow its detection
            
            % Check for (min,max) PreAnswerTime
 %            if (~isnumeric(pa_t)) % assume format is correct!
@@ -228,7 +232,7 @@ switch action
            end
            
            % Adjust prepause based on bitcode, initial trigger
-           prep_t = prep_t - 0.01 - 0.077; % 2 ms bit, 5 ms interbit, 11 bits = 77 ms = .077 s
+           prep_t = prep_t - 0.01 - 0.084; % 2 ms bit, 5 ms interbit, 12 bits = 84 ms = .084 s
            
            % Adjust prepause based on bitcode for sending angles
            prep_t = max([prep_t - 0.32, 0.001]); % 20 ms bit, 20 ms interbit, 8 bits = 320 ms = .32 s
@@ -276,7 +280,7 @@ switch action
                onlickL  onlickL  onlickR  onlickR  sLoMi    ap_t      pvid       0; ... % sPrAP: preanswer pause
                sLoMi    sLoMi    sLoMi    sLoMi    sPoTP    0.001     0          0; ... % sLoMi: log miss/ignore
                sPoTP    sPoTP    sPoTP    sPoTP    201      postp_t   0          0; ... % sPoTP: posttrial pause; 201 is for turning the pole 90 again after each trial.
-               sRDel    sPun     sRDel    sPun     pps      eto_t     pvid       0; ... % sPun: punish & pps = sPoTP @ line 203
+               sPun     sPun     sPun     sPun     pps      rcoll_t   0          0; ... % sPun: punish & pps = sPoTP @ line 203
                sRwL     sRwL     sRwL     sRwL     sRCol    water_t   pvid+wvLid 0; ... % sRwL: reward left
                sRwR     sRwR     sRwR     sRwR     sRCol    water_t   pvid+wvRid 0; ... % sRwR: reward right                      
                sRCaT    sRCaT    sRCaT    sRCaT    sPoTP    0.001     pvid       0; ... % sRCaT: to log unrewarded correct trials              
@@ -293,11 +297,17 @@ switch action
            bittm = 0.002; % bit time
            gaptm = 0.005; % gap (inter-bit) time
            numbits = 12; %2^11=2048 possible trial nums
-           % + 1 bit for arrival indication 02/22/16 JK for scanbox
 
-           
 %            x = double(dec2binvec(trialnum)');
-           x = double(dec2binvec(trialnum * 2 + 1)');
+%            x = double(dec2binvec(trialnum * 2 + 1)'); % + 1 bit for
+%            arrival indication 02/22/16 JK for scanbox
+
+           x = double(dec2binvec(trialnum * 2)'); % insert 0 before start, 
+%            because slid was on when pole is up and it did not turn to 0
+%            yet. 2017/05/18 JK. No ambiguity about bitcode arrival for
+%            now, because the scanbox is receiving 3 for pole up and 2 for
+%            pole down. First gap time is 10 ms (sBC TimeupSt).
+
            % + 1 before LSB to signal when the code has been sent %
            % 02/22/16 JK for scanbox 
 

@@ -14,19 +14,21 @@ switch action
         next_row(y);
         NumeditParam(obj, 'RewardCollectTime', 1, x, y, 'TooltipString', ...
             'Time after animal gets reward where lickoprt not withdrawn');
-        next_row(y);        MenuParam(obj, 'ExtraITIOnError', {'0', '2','3','4','5','6','7','8','9','10','11','12','13','14','15','20','25','30'},'2', x, y);
+        next_row(y);        MenuParam(obj, 'ExtraITIOnError', {'0', '2','3','4','5','6','7','8','9','10','11','12','13','14','15','20','25','30'},'0', x, y);
         next_row(y);
-        NumeditParam(obj, 'AnswerPeriodTime', 1, x,y); % Can be modified by make_and_upload_state_matrix
+        NumeditParam(obj, 'AnswerPeriodTime', 3, x,y); % Can be modified by make_and_upload_state_matrix
         next_row(y, 1);
-        EditParam(obj, 'LickportTravelTime', '.001', x, y, 'TooltipString', ...
-            'How long for lickport to move into reach? NOT part of trial duration');
-        next_row(y);
+%         EditParam(obj, 'LickportTravelTime', '.001', x, y, 'TooltipString', ...
+%             'How long for lickport to move into reach? NOT part of trial duration');
+%         next_row(y); % used in make_and_upload. I don't need this.
+%         2017/10/10 JK
         MenuParam(obj, 'RestartPreAnsOnLick', {'on','off'},'off', x, y);      
         next_row(y);          
-        EditParam(obj, 'PreAnswerTime', '.5', x, y, 'TooltipString', ...
-            'Time animal waits after pole is retracted but before answer counts');
-        next_row(y);
-        MenuParam(obj, 'SamplingPeriodTime', {'0.2','0.5','0.75','1','1.25','1.5','1.75','2','2.5','3'},'1', x, y);
+%         EditParam(obj, 'PreAnswerTime', '.5', x, y, 'TooltipString', ...
+%             'Time animal waits after pole is retracted but before answer counts');
+%         next_row(y); % used in make_and_upload. I don't need this.
+%         2017/10/10 JK
+        MenuParam(obj, 'SamplingPeriodTime', {'0.2','0.5','0.75','1','1.25','1.5','1.75','2','2.5','3'},'0.5', x, y);
         next_row(y);
         NumeditParam(obj, 'PoleRetractTime', 0.5, x, y, 'TooltipString', ...
             'Time allowed for removing the pole before start answering period');
@@ -41,10 +43,15 @@ switch action
 %             aptm = 2 - value(SamplingPeriodTime);
 %         end
 
+%         SoloFunctionAddVars('make_and_upload_state_matrix', 'ro_args', ...
+%             {'ExtraITIOnError','SamplingPeriodTime','PreTrialPauseTime', ...
+%             'PreAnswerTime','PostTrialPauseTime','PoleRetractTime','RewardCollectTime', ...
+%             'LickportTravelTime','RestartPreAnsOnLick'});
         SoloFunctionAddVars('make_and_upload_state_matrix', 'ro_args', ...
             {'ExtraITIOnError','SamplingPeriodTime','PreTrialPauseTime', ...
-            'PreAnswerTime','PostTrialPauseTime','PoleRetractTime','RewardCollectTime', ...
-            'LickportTravelTime','RestartPreAnsOnLick'});
+            'PostTrialPauseTime','PoleRetractTime','RewardCollectTime', ...
+            'RestartPreAnsOnLick'});
+
         SoloFunctionAddVars('make_and_upload_state_matrix', 'rw_args', ...
             {'AnswerPeriodTime'});
             

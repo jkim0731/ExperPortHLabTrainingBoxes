@@ -163,7 +163,7 @@ switch action
             'Angle w/o distractor', 'TooltipString', 'Will be used when Distractor is OFF'); 
         
         next_row(y);
-        NumeditParam(obj, 'angle_offset', 5, x, y, 'label', ...
+        NumeditParam(obj, 'angle_offset', 0, x, y, 'label', ...
             'Angle offset', 'TooltipString', 'Angle added for vertical whisking compensation'); 
         
         next_row(y);
@@ -179,7 +179,7 @@ switch action
             'Far down position offset (+)', 'TooltipString', 'Microstepts to be added for R-dL trials to minimize differences in contact angles'); 
                 
         next_row(y);
-        NumeditParam(obj, 'ap_set_position', 80000, x, y, 'label', ...
+        NumeditParam(obj, 'ap_set_position', 30000, x, y, 'label', ...
             'AP position');
         
         next_row(y);
@@ -204,7 +204,7 @@ switch action
         
         next_absolute_angle = 90;
         SoloFunctionAddVars('make_and_upload_state_matrix', 'ro_args', {'next_absolute_angle'}); 
-%         MotorsSection(obj, 'move_next_side');
+        MotorsSection(obj, 'move_next_side');
         
         return;
 
@@ -236,7 +236,7 @@ switch action
                 end
                 next_pole_sign = 'm';                 
                 ap_offset_factor_dist = 0;
-            elseif strcmp(TaskTarget, 'Angle-Continuous')
+            elseif strcmp(TaskTarget, 'Angle-Continuous') 
                 if next_side == 'r'
                     next_pole_sign = 'ar'; % random-right
                 elseif next_side == 'l'
@@ -246,6 +246,16 @@ switch action
                 end
                 next_pole_dist = value(dist_wo_dstr);
                 ap_offset_factor_dist = 1;
+            elseif strcmp(TaskTarget, 'Angle-Discrete')
+                if next_side == 'r'
+                    next_pole_sign = 'dr'; % random-discrete-right
+                elseif next_side == 'l'
+                    next_pole_sign = 'dl'; % random-discrete-left
+                else
+                    error('un-recognized type of choice (left or right)');
+                end
+                next_pole_dist = value(dist_wo_dstr);
+                ap_offset_factor_dist = 1;                                       
             elseif strcmp(TaskTarget, 'RadialDistance-Continuous')
                 if next_side == 'r'
                     next_pole_dist = value(far_dist) + rand/2 * (value(near_dist) - value(far_dist));
@@ -438,6 +448,14 @@ switch action
             next_absolute_angle = next_pole_angle + floor(rand*(90-next_pole_angle)) + angle_offset;
         elseif strcmp(next_pole_sign, 'al') % continous angle target, with left reward
             next_absolute_angle = (180 - next_pole_angle) - floor(rand*(90-next_pole_angle)) + angle_offset;            
+        elseif strcmp(next_pole_sign, 'dr') % discrete angle target set 1, with right reward
+            temp_angle_list = [0, 15, 30, 45];
+            temp_rand = ceil(rand * length(temp_angle_list));
+            next_absolute_angle = next_pole_angle + temp_angle_list(temp_rand) + angle_offset;
+        elseif strcmp(next_pole_sign, 'dl') % discrete angle target set 1, with left reward
+            temp_angle_list = [0, 15, 30, 45];
+            temp_rand = ceil(rand * length(temp_angle_list));
+            next_absolute_angle = (180 - next_pole_angle) - temp_angle_list(temp_rand) + angle_offset;            
         else
             error('un-recognized pole angle sign')
         end
@@ -471,13 +489,13 @@ switch action
 
         SoloFunctionAddVars('make_and_upload_state_matrix', 'ro_args', {'next_absolute_angle'}); % Moving pole angle is done with state matrix via arduino
         
-        previous_pole_distances(n_started_trials) = next_pole_dist;
-        previous_pole_ap_positions(n_started_trials) = ap_move;
-        previous_pole_angles(n_started_trials) = next_absolute_angle;
+%         previous_pole_distances(n_started_trials) = next_pole_dist;
+%         previous_pole_ap_positions(n_started_trials) = ap_move;
+%         previous_pole_angles(n_started_trials) = next_absolute_angle;
 
-%         previous_pole_distances(n_started_trials+1) = next_pole_dist;
-%         previous_pole_ap_positions(n_started_trials+1) = ap_move;
-%         previous_pole_angles(n_started_trials+1) = next_absolute_angle;
+        previous_pole_distances(n_started_trials+1) = next_pole_dist;
+        previous_pole_ap_positions(n_started_trials+1) = ap_move;
+        previous_pole_angles(n_started_trials+1) = next_absolute_angle;
 
         return;
         

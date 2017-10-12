@@ -43,7 +43,7 @@ function [x, y] = ValvesSection(obj, action, x, y)
       %EditParam(obj, 'RWaterValveTime',
       %valves_properties.lwater_valve_time, x, y);  next_row(y); 
       EditParam(obj, 'LWaterValveTime', '0.11', x, y);  next_row(y); % Edited by JK 12/30/2015 for L-R integration
-      EditParam(obj, 'RWaterValveTime', '0.1', x, y);  next_row(y); % Edited by JK 12/30/2015
+      EditParam(obj, 'RWaterValveTime', '0.11', x, y);  next_row(y); % Edited by JK 12/30/2015
 
       SoloFunctionAddVars('make_and_upload_state_matrix', 'ro_args', {'RWaterValveTime'});
       SoloFunctionAddVars('make_and_upload_state_matrix', 'ro_args', {'LWaterValveTime'});
