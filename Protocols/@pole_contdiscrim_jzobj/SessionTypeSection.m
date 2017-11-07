@@ -4,7 +4,7 @@
 %
 % PARAMETERS:
 % -----------
-%
+%test
 % obj      Default object argument.
 %
 % action   One of:
@@ -39,51 +39,15 @@ function [x, y] = SessionTypeSection(obj, action, x, y)
       % going to start adding GUI elements:
       SoloParamHandle(obj, 'my_gui_info', 'value', [x y gcf]);
 
-      MenuParam(obj, 'SessionType', {'Licking','2port-Discrim',...
-          'LWater-Valve-Calibration','RWater-Valve-Calibration',...
-          'Piezo stimulation', ... % 2017/10/01 JK
-          'Passive Pole' ... % 2017/10/30 JK
-%           'Beam-Break-Indicator', ... % 2016/05/23 JK
-          },'2port-Discrim', x, y);
+      MenuParam(obj, 'SessionType', {'Licking','Pole-conditioning','Detection_SP','Detection_SP_leaveUp','Discrim_DHO',...
+          'Water-Valve-Calibration','FlashLED','testOutputs'},'Discrim_DHO', x, y);
       
       SoloFunctionAddVars('make_and_upload_state_matrix', 'ro_args', {'SessionType'});
-      SoloFunctionAddVars('SidesSection', 'ro_args', {'SessionType'}); % this is for the cases of lick or pole-conditioning
-      SoloFunctionAddVars('state35', 'ro_args', 'SessionType'); 
+      SoloFunctionAddVars('SidesSection', 'ro_args', {'SessionType'});
+      SoloFunctionAddVars('state35', 'ro_args', 'SessionType');
       next_row(y, 1);
-      
-      % The session can be either angle discrimination or radial distance
-      % discrimination
-      MenuParam(obj, 'TaskTarget', {'Angle', 'RadialDistance', 'Angle-Continuous', 'Angle-Discrete', 'RadialDistance-Continuous', 'RadialDistance-Discrete'},'Angle',x,y); 
-      SoloFunctionAddVars('MotorsSection', 'ro_args', {'TaskTarget'});
-      next_row(y,1);
-      
-      % Whether or not to have a distractor
-      MenuParam(obj, 'Distractor', {'Discrete','Continuous','On', 'Off'},'Off',x,y); 
-      SoloFunctionAddVars('MotorsSection', 'ro_args', {'Distractor'});
-      SoloFunctionAddVars('SidesSection', 'ro_args', {'Distractor'});
-      next_row(y,1);
-      
-      % For imaging
-      MenuParam(obj, 'TPM_imaging', {'Normal','Block'},'Normal',x,y); 
-      SoloFunctionAddVars('state35', 'ro_args', {'TPM_imaging'});
-      next_row(y,1);
-      
-      
-      
-      % For the time being there will be only 'Discrete2' mode for both the
-      % angle and Rdist %2016/03/27 JK
-%       % The angle and radial distance can be continuous or discrete (2
-%       % point) 
-%       MenuParam(obj, 'AngleType', {'Discrete2', 'Continuous'},'Discrete2',x,y);
-%       SoloFunctionAddVars('MotorsSection', 'ro_args', {'AngleType'});
-%       next_row(y,1);
-%       
-%       MenuParam(obj, 'RDistType', {'Discrete2', 'Continuous'},'Discrete2',x,y);
-%       SoloFunctionAddVars('MotorsSection', 'ro_args', {'RDistType'});
-%       next_row(y,1);
-      
       SubheaderParam(obj, 'title', 'Type of Session', x, y);
-
+      next_row(y, 1.5);
       
 %     case 'get_session_type'  
 %       x = value(SessionType);
