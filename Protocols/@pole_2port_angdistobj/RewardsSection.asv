@@ -22,23 +22,15 @@
       push_history(LastTrialEvents); LastTrialEvents.value = [];
       
       % miss in no-go catch trial is a hit
-      if previous_sides(end) == 'o' % no-go catch trial
-          if rows(pstruct.punish)>0 
-              hit = 0;
-          elseif rows(pstruct.miss)>0 
-              hit = 1;
-          else
-              hit = 1;
-          end
+      if 
+      if rows(pstruct.punish)>0 
+          hit = 0;
+      elseif rows(pstruct.miss)>0 
+          hit = -1;
       else
-          if rows(pstruct.punish)>0 
-              hit = 0;
-          elseif rows(pstruct.miss)>0 
-              hit = -1;
-          else
-              hit = 1;
-          end
-      end      
+          hit = 1;
+      end
+      
       
       hh = hit_history(:);
       hh(n_started_trials) = hit;

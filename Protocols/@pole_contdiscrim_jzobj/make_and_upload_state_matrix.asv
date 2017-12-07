@@ -201,7 +201,7 @@ switch action
            % GUI:
            bittm = 0.002; % bit time
            gaptm = 0.005; % gap (inter-bit) time
-           numbits = 10; %2^10=1024 possible trial nums
+           numbits = 11; %2^10=1024 possible trial nums
 %            x = double(dec2binvec(trialnum)');
 %            x = double(dec2binvec(trialnum * 2 + 1)'); % + 1 bit for
 %            arrival indication 02/22/16 JK for scanbox           
@@ -476,9 +476,9 @@ switch action
            error('Invalid training session type')
    end
    
-   if strcmp(SessionType,'2port-Discrim')
-    stm(sBC:end,7) = stm(sBC:end,7) + durid; % pad all Dout with durid, except for state 35 and 0. sBC = 40; Indicating duration of whisker video imaging.
-   end
+    if strcmp(SessionType,'Discrim_DHO')
+        stm(b:end,5) = stm(b:end,5) + durid; % pad all Dout with durid, except for state 35 and 0. sBC = 40; Indicating duration of whisker video imaging.
+    end
    
    stm = [stm; zeros(512-rows(stm),6)];
 

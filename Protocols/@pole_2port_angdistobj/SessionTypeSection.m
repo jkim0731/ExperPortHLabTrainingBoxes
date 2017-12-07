@@ -63,6 +63,13 @@ function [x, y] = SessionTypeSection(obj, action, x, y)
       SoloFunctionAddVars('SidesSection', 'ro_args', {'Distractor'});
       next_row(y,1);
       
+      MenuParam(obj, 'Catch', {'On', 'Off'},'On',x,y); 
+      SoloFunctionAddVars('MotorsSection', 'ro_args', {'Catch'});
+      SoloFunctionAddVars('SidesSection', 'ro_args', {'Catch'});
+      SoloFunctionAddVars('MotorsSection', 'ro_args', {'Catch'});
+      next_row(y,1);
+      
+      
       % For imaging
       MenuParam(obj, 'TPM_imaging', {'Normal','Block'},'Normal',x,y); 
       SoloFunctionAddVars('state35', 'ro_args', {'TPM_imaging'});

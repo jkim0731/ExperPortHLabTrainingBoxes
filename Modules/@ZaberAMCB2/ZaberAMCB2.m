@@ -12,7 +12,7 @@ function z = ZaberAMCB2(a)
 % disp('function ZaberAMCB2 is called');%%%
 
 if nargin==0
-    z.sobj = serial('COM7','BaudRate',9600,'DataBits',8,'Parity','none','StopBits',1,...
+    z.sobj = serial('COM6','BaudRate',9600,'DataBits',8,'Parity','none','StopBits',1,...
         'InputBufferSize',64,'OutputBufferSize',64); % Input and output codes are all 6 bytes each
     set(z.sobj,'BytesAvailableFcnCount',6,'BytesAvailableFcnMode','byte')
     z.unit = 0;

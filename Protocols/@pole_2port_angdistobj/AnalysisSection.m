@@ -47,15 +47,7 @@ switch action
         set_callback(analysis_show, {mfilename,'hide_show'});
 
         next_row(y);
-        MenuParam(obj, 'email_enable', {'yes', 'no'}, 'no', x, y, 'label', 'e-mail?', 'TooltipString', 'Toggle for e-mailing when the mouse is done');
-        next_row(y);
-        EditParam(obj, 'emailad', 'jkimkj@gmail.com', x, y);
-        next_row(y);
-        EditParam(obj, 'numign', '5', x, y);
-        next_row(y);
-        PushButtonParam(obj, 'emailreset', x, y, 'label', 'Reset email flag');
-        set_callback(emailreset, {mfilename, 'emailreset'});
-        next_row(y);
+        
         SubheaderParam(obj, 'sectiontitle', 'Analysis', x, y);
 
         parentfig_x = x; parentfig_y = y;
@@ -68,29 +60,39 @@ switch action
         x = 1; y = 1;
         
         % text stuff
-        DispParam(obj, 'DprimeEQ',  '0.000  0.000  n/a', x, y, 'TooltipString', ...
-            'D-prime considering only extremal quartiles of position range'); next_row(y);
-        DispParam(obj, 'Dprime60',  '0.000  0.000  n/a', x, y, 'TooltipString', ...
-            'D-prime considering last 60 trials only');  next_row(y);
-        DispParam(obj, 'Dprime',    '0.000  0.000  n/a', x, y); next_row(y);
-        DispParam(obj, 'PctCorrect','000.0  000.0  000.0', x, y); next_row(y);
+        % d' does not give any more information than percent correct in
+        % 2-port discrimination 
+%         DispParam(obj, 'DprimeEQ',  '0.000  0.000  n/a  n/a', x, y, 'TooltipString', ...
+%             'D-prime considering only extremal quartiles of position range'); next_row(y);
+%         DispParam(obj, 'Dprime60',  '0.000  0.000  n/a  n/a', x, y, 'TooltipString', ...
+%             'D-prime considering last 60 trials only');  next_row(y);
+%         DispParam(obj, 'Dprime',    '0.000  0.000  n/a   n/a', x, y); next_row(y);
+        DispParam(obj, 'PC60','000.0  000.0   000.0', x, y); next_row(y);
+        DispParam(obj, 'PctCorrect','000.0  000.0   000.0', x, y); next_row(y);
         DispParam(obj, 'NumIgnores', '0000   0000   0000', x, y); next_row(y);
         DispParam(obj, 'NumRewards','0000   0000   0000', x, y); next_row(y);
         DispParam(obj, 'NumTrials', '0000   0000   0000', x, y); next_row(y);
-        DispParam(obj, 'Label',     '  L      R    Tot  ' ,x, y); next_row(y);
+        DispParam(obj, 'Label',     '  L      R      Tot  ',x, y); 
+        next_column(x); y = 1;
+
+        DispParam(obj, 'PC_catch','000.0', x, y); next_row(y);
+        DispParam(obj, 'NI_catch', '0000', x, y); next_row(y);
+        DispParam(obj, 'NR_catch','0000', x, y); next_row(y);
+        DispParam(obj, 'NT_catch', '0000', x, y); next_row(y);
+        DispParam(obj, 'Label', 'Catch',x, y); next_row(y);
         
-        % Figure with position-dependent %correct
-        pos = get(gcf, 'Position');
-        SoloParamHandle(obj, 'poscoraxes', 'saveable', 0, 'value', axes);
-        set(value(poscoraxes), 'Units', 'pixels');
-        set(value(poscoraxes), 'Position', [50 pos(4)-110 pos(3)-60 100]);
-        set(value(poscoraxes), 'YTick', [0 0.5 1], 'YLim', [0 1], 'YTickLabel', ...
-                        {'0', '0.5', '1'});
-        set(value(poscoraxes), 'XTick', 1:2:17, 'XLim', [0 18], 'XTickLabel', ...
-                        {'1','3','5','7','9','11','13','15','17'});  
-        xlabel('position ctr (10Ks of Zaber units; 20K bins)');
-        ylabel('frac correct');
-        SoloParamHandle(obj, 'previous_poscor_plot', 'saveable', 0);
+%         % Figure with position-dependent %correct
+%         pos = get(gcf, 'Position');
+%         SoloParamHandle(obj, 'poscoraxes', 'saveable', 0, 'value', axes);
+%         set(value(poscoraxes), 'Units', 'pixels');
+%         set(value(poscoraxes), 'Position', [50 pos(4)-110 pos(3)-60 100]);
+%         set(value(poscoraxes), 'YTick', [0 0.5 1], 'YLim', [0 1], 'YTickLabel', ...
+%                         {'0', '0.5', '1'});
+%         set(value(poscoraxes), 'XTick', 1:2:17, 'XLim', [0 18], 'XTickLabel', ...
+%                         {'1','3','5','7','9','11','13','15','17'});  
+%         xlabel('position ctr (10Ks of Zaber units; 20K bins)');
+%         ylabel('frac correct');
+%         SoloParamHandle(obj, 'previous_poscor_plot', 'saveable', 0);
 
         AnalysisSection(obj,'hide_show');
                 
@@ -109,10 +111,11 @@ switch action
         % ALL trials
         sL = find(previous_sides(1:end-1) == 108); % 108 is char for l
         sR = find(previous_sides(1:end-1) == 114); % 114 is char for r
+        sN = find(previous_sides(1:end-1) == 'o'); % 'o' == 111, for nogo (catch trials) 2017/11/24 JK
         sLNI = find(previous_sides(1:end-1) == 108 & correct' >= 0 ); % 108 is char for l
         sRNI = find(previous_sides(1:end-1) == 114 & correct' >= 0 ); % 114 r
         
-        % only consider trials w/ respnoses
+        % only consider trials w/ responses
         if (length(nonIgnores) >= 61)
             nI60 = nonIgnores((end-60):(end-1));
             sL60 = find(previous_sides(nI60) == 108 ...
@@ -122,7 +125,7 @@ switch action
             sL60 = nI60(sL60);
             sR60 = nI60(sR60);
         else
-            sL60 = [] ;sR60 = [];
+            nI60 = []; sL60 = [] ;sR60 = []; 
         end
         
         % quartile estimator -- assumption is that each extremal quartile
@@ -159,118 +162,103 @@ switch action
         % # trials
         nt =     [length(sL) ...
                   length(sR) ...
-                  length(previous_sides(1:end-1))];
+                  length(sN) ...
+                  length(previous_sides(1:end-1)) - length(find(previous_sides(1:end-1)=='o'))];
         ntNI =     [length(sLNI) ...
                   length(sRNI) ...
-                  length(nonIgnores)];
-        nt60 = [length(sL60) length(sR60)];
-        ntEQ = [length(sQ4) length(sQ1)];
+                  length(sN) ...
+                  length(sLNI) + length(sRNI)];
+        nt60 = [length(sL60) length(sR60) length(nI60)];
+%         ntEQ = [length(sQ4) length(sQ1)];
         
         % # rewards
-        nr = [length(find(correct(sL) ==1)) length(find(correct(sR) ==1)) ...
-              length(find(correct == 1))];
-        nr60 = [length(find(correct(sL60) ==1)) length(find(correct(sR60) ==1))];
-        nrEQ = [length(find(correct(sQ4) ==1)) length(find(correct(sQ1) ==1))];
+        nr = [length(find(correct(sL) == 1)), length(find(correct(sR) == 1)), ...
+              length(find(correct(sN) == 1)), length(find(correct(sL) == 1)) + length(find(correct(sR) == 1))];
+        nr60 = [length(find(correct(sL60) ==1)) length(find(correct(sR60) ==1)) length(find(correct(nI60) == 1))];
+%         nrEQ = [length(find(correct(sQ4) ==1)) length(find(correct(sQ1) ==1))];
          
         % # incorrects (DISTINCT from cases where he did not respond)
-        ni = [length(find(correct(sL) ==0)) length(find(correct(sR) ==0)) ...
-              length(find(correct == 0))];
-        nig = [length(find(correct(sL) ==-1)) length(find(correct(sR) ==-1)) ...
-              length(find(correct == -1))];
+        ni = [length(find(correct(sL) == 0)), length(find(correct(sR) == 0)), ...
+              length(find(correct(sN) == 0)), length(find(correct(sL) == 0))+length(find(correct(sR) == 0))];
+        nig = [length(find(correct(sL) ==-1)), length(find(correct(sR) ==-1)), ...
+              0, length(find(correct(sL) == -1)) + length(find(correct(sR) ==-1))];
         ni60 = [length(find(correct(sL60) ==0)) length(find(correct(sR60) ==0))];
-        niEQ = [length(find(correct(sQ4) ==0)) length(find(correct(sQ1) ==0))];
+%         niEQ = [length(find(correct(sQ4) ==0)) length(find(correct(sQ1) ==0))];
         
         % %correct
         pc= 100*nr./ntNI;
+        pc60 = 100*nr60./nt60;
+        % d' does not give any more information than percent correct in
+        % 2-port discrimination
+%         % D-prime REGULAR
+%         
+%         % dprime (hit rate, false-alarm rate, # stim in hit/miss pos, #
+%         %          stim cr/fa pos) 
+%         % NOTE: we EXCLUDE ignore trials from d' calculation
+%         dpL = dprime(nr(1)/ntNI(1), ni(2)/ntNI(2), ntNI(1), ntNI(2));
+%         dpR = dprime(nr(2)/ntNI(2), ni(1)/ntNI(1), ntNI(2), ntNI(1));
+%         
+%         % D-prime last 60
+%         dpL60 = dprime(nr60(1)/nt60(1), ni60(2)/nt60(2), nt60(1), nt60(2));
+%         dpR60 = dprime(nr60(2)/nt60(2), ni60(1)/nt60(1), nt60(2), nt60(1));       
+%         
+%         % D-prime extreme quartiles
+%         dpLEQ = dprime(nrEQ(1)/ntEQ(1), niEQ(2)/ntEQ(2), ntEQ(1), ntEQ(2));
+%         dpREQ = dprime(nrEQ(2)/ntEQ(2), niEQ(1)/ntEQ(1), ntEQ(2), ntEQ(1));      
         
-        % D-prime REGULAR
-        
-        % dprime (hit rate, false-alarm rate, # stim in hit/miss pos, #
-        %          stim cr/fa pos) 
-        % NOTE: we EXCLUDE ignore trials from d' calculation
-        dpL = dprime(nr(1)/ntNI(1), ni(2)/ntNI(2), ntNI(1), ntNI(2));
-        dpR = dprime(nr(2)/ntNI(2), ni(1)/ntNI(1), ntNI(2), ntNI(1));
-        
-        % D-prime last 60
-        dpL60 = dprime(nr60(1)/nt60(1), ni60(2)/nt60(2), nt60(1), nt60(2));
-        dpR60 = dprime(nr60(2)/nt60(2), ni60(1)/nt60(1), nt60(2), nt60(1));       
-        
-        % D-prime extreme quartiles
-        dpLEQ = dprime(nrEQ(1)/ntEQ(1), niEQ(2)/ntEQ(2), ntEQ(1), ntEQ(2));
-        dpREQ = dprime(nrEQ(2)/ntEQ(2), niEQ(1)/ntEQ(1), ntEQ(2), ntEQ(1));      
-        
-        % %correct in position bins
-        posbin_count = zeros(9,1);
-        posbin_frac_correct = nan*zeros(9,1);
-        posbin = 0:20000:160000;        
-        posbin_xvals = 1:2:17;
-        for pb=1:9
-            if (pb == length(posbin))
-                idx = find(pole_distance_history >= posbin(pb) & ...
-                           pole_distance_history <= posbin(pb)+20000);
-            else
-                idx = find(pole_distance_history >= posbin(pb) & ...
-                           pole_distance_history < posbin(pb)+20000);
-            end
-            posbin_count(pb) = length(idx);
-            if (length(idx)>0)
-              n_correct = length(find(hit_history(idx) == 1));
-              posbin_frac_correct(pb)= n_correct/length(idx);
-            end
-        end
+%         % %correct in position bins
+%         posbin_count = zeros(9,1);
+%         posbin_frac_correct = nan*zeros(9,1);
+%         posbin = 0:20000:160000;        
+%         posbin_xvals = 1:2:17;
+%         for pb=1:9
+%             if (pb == length(posbin))
+%                 idx = find(pole_distance_history >= posbin(pb) & ...
+%                            pole_distance_history <= posbin(pb)+20000);
+%             else
+%                 idx = find(pole_distance_history >= posbin(pb) & ...
+%                            pole_distance_history < posbin(pb)+20000);
+%             end
+%             posbin_count(pb) = length(idx);
+%             if (length(idx)>0)
+%               n_correct = length(find(hit_history(idx) == 1));
+%               posbin_frac_correct(pb)= n_correct/length(idx);
+%             end
+%         end
         
         % --- update plot
-        if ~isempty(value(previous_poscor_plot)), delete(previous_poscor_plot(:)); end;
-        if isempty(previous_sides), return; end;
-
-        % BLUE dots
-        xvals = posbin_xvals;
-        yvals = posbin_frac_correct;
-        
-        hb = line(xvals,yvals, 'Parent', value(poscoraxes));
-        set(hb, 'Color', 'b', 'Marker', '.', 'LineStyle', 'none');
-      %  arange = axis;
-     %   
-    %    plot([arange(1) arange(2)], [0.5 0.5], 'k:');
-      
-        previous_poscor_plot.value = [hb];
-
-        drawnow;
+%         if ~isempty(value(previous_poscor_plot)), delete(previous_poscor_plot(:)); end;
+%         if isempty(previous_sides), return; end;
+% 
+%         % BLUE dots
+%         xvals = posbin_xvals;
+%         yvals = posbin_frac_correct;
+%         
+%         hb = line(xvals,yvals, 'Parent', value(poscoraxes));
+%         set(hb, 'Color', 'b', 'Marker', '.', 'LineStyle', 'none');
+%       %  arange = axis;
+%      %   
+%     %    plot([arange(1) arange(2)], [0.5 0.5], 'k:');
+%       
+%         previous_poscor_plot.value = [hb];
+% 
+%         drawnow;
       
         % --- update strings
-        NumTrials.value = sprintf('%04d  %04d  %04d', nt(1), nt(2), nt(3));
-        NumIgnores.value = sprintf('%04d  %04d  %04d', nig(1), nig(2), nig(3));   
-        NumRewards.value = sprintf('%04d  %04d  %04d', nr(1), nr(2), nr(3));   
-        PctCorrect.value = sprintf('%05.1f  %05.1f  %05.1f', pc(1), pc(2), pc(3));   
-        Dprime.value = sprintf('%05.3f  %05.3f  n/a', dpL, dpR);
-        Dprime60.value = sprintf('%05.3f  %05.3f  n/a', dpL60, dpR60);
-        DprimeEQ.value = sprintf('%05.3f  %05.3f  n/a', dpLEQ, dpREQ);
+        NumTrials.value = sprintf('%04d  %04d  %04d', nt(1), nt(2), nt(4));
+        NumIgnores.value = sprintf('%04d  %04d  %04d', nig(1), nig(2), nig(4));   
+        NumRewards.value = sprintf('%04d  %04d  %04d', nr(1), nr(2), nr(4));   
+        PctCorrect.value = sprintf('%05.1f  %05.1f  %05.1f', pc(1), pc(2), pc(4));   
+        PC60.value       = sprintf('%05.1f  %05.1f  %05.1f', pc60(1), pc60(2), pc60(3));   
+%         Dprime.value = sprintf('%05.3f  %05.3f  n/a', dpL, dpR);
+%         Dprime60.value = sprintf('%05.3f  %05.3f  n/a', dpL60, dpR60);
+%         DprimeEQ.value = sprintf('%05.3f  %05.3f  n/a', dpLEQ, dpREQ);
         %---------------------------------------------------
- 
-        
-      % send e-mail in case when the mouse is done when you are not attending the training 
-      % Send e-mail just once, when there were 5 (or adjustable # of)
-      % consecutive ignores
-      % 2016/11/05 JK
-%       if strcmpi(value(email_enable), 'yes')            
-%         if length(hit_history) > 100 % at least 100 trials...
-%           if isempty(find(hit_history(end-value(numign) + 1:end) ~= -1))
-%               global mailsent % defined in obj file.
-%               if mailsent == 0 
-%                     setpref('Internet','SMTP_Username','hireslabmouse@gmail.com')
-%                     setpref('Internet','SMTP_Password','hlabmouse')
-%                     setpref('Internet','SMTP_Server','smtp.gmail.com');
-%                     setpref('Internet','E_mail','hireslabmouse@gmail.com')
-%                     props = java.lang.System.getProperties;
-%                     props.setProperty('mail.smtp.auth','true')
-%                     props.setProperty('mail.smtp.socketFactory.class','javax.net.ssl.SSLSocketFactory');
-%                     props.setProperty('mail.smtp.socketFactory.port','465')
-%                   sendmail(value(emailad),'Your mouse is done in TPM rig', 'Come save me..')
-%                   mailsent = 1; 
-%               end
-%           end
-%         end
-%       end        
+        NT_catch.value = sprintf('%04d', nt(3));
+        NI_catch.value = sprintf('%04d', nig(3));   
+        NR_catch.value = sprintf('%04d', nr(3));   
+        PC_catch.value = sprintf('%05.1f', pc(3));    
+      
     case 'hide_show'
         if strcmpi(value(analysis_show), 'hide')
             set(value(analysisfig), 'Visible', 'off');

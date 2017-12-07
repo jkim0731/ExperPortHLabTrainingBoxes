@@ -260,10 +260,16 @@ switch action
                onlickL = sPun; % incorrect
                onlickR = sRwR; % correct
                water_t = RWaterValveTime; % Defined in ValvesSection.m.  
-           else %left 
+           elseif next_side == 'l' % left trial.
                onlickR = sPun; % punish
                onlickL = sRwL; % water to left port
                water_t = LWaterValveTime; % Defined in ValvesSection.m.  
+           elseif next_side == 'o' % catch trial (no-go)
+               onlickR = sPun; % punish
+               onlickL = sPun; % punish               
+               water_t = 0;
+           else
+               error('next_side not decided.')
            end  
            
            % Disable reward?  If so, do it by setting wv
