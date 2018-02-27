@@ -36,7 +36,7 @@ if strcmp(SessionType, '2port-Discrim')
                 judp('SEND', 7000, '68.181.112.192', [int8('IA') 10]); 
             end
             judp('SEND', 7000, '68.181.112.192', [int8('L0') 10]); 
-            pause(1); % wait for 3 sec when the objective has moved
+            pause(1); % wait for 1 sec when the objective has moved
         else
             judp('SEND', 7000, '68.181.112.192', [int8('L0') 10]); 
             pause(1); % laser blanking, and pausing for extra 1 sec

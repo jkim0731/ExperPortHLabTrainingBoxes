@@ -604,7 +604,8 @@ switch action
                 error('No variable named Distractor exists')
             end
         end
-        
+
+        angle_offset = value(angle_offset);
         if next_pole_sign == 'r'
             next_absolute_angle = next_pole_angle + angle_offset;
         elseif next_pole_sign == 'l'
@@ -629,17 +630,30 @@ switch action
             error('un-recognized pole angle sign')
         end
         
-        ap_offset_factor_angle = (next_absolute_angle - angle_offset - next_pole_angle)/(180 - 2 * next_pole_angle);
+        if next_pole_angle < 90
+%             ap_offset_factor_angle = (next_absolute_angle - angle_offset
+%             - next_pole_angle)/(180 - 2 * next_pole_angle);    
+            ap_offset_factor_angle = 0;
+        else
+            ap_offset_factor_angle = 0;
+        end
 %         ap_offset_dist = determined up above;        
         apjitter = (rand)* value(apjitter_max);
         disp(['jitter = ',num2str(apjitter)])
         
-
+        
         ap_position = round(value(ap_set_position));
         if next_side=='o'
             ap_move = 0;
         else
-            ap_move = floor(ap_position - apjitter) + fardown_offset * (1-ap_offset_factor_dist) + farup_offset * ap_offset_factor_angle + (nearup_offset - farup_offset) * ap_offset_factor_angle * ap_offset_factor_dist; % Changed from + apjitter to - apjitter 
+            if next_absolute_angle <= 90 % right, down
+                ap_move = floor(ap_position - apjitter + fardown_offset * (1-ap_offset_factor_dist));
+            else
+                ap_move = floor(ap_position - apjitter + nearup_offset + (farup_offset - nearup_offset) * (1-ap_offset_factor_dist));
+%             ap_move = floor(ap_position - apjitter) + fardown_offset * (1-ap_offset_factor_dist) + farup_offset * ap_offset_factor_angle + (nearup_offset - farup_offset) * ap_offset_factor_angle * ap_offset_factor_dist; % Changed from + apjitter to - apjitter 
+%             ap_move = floor(ap_position - apjitter) + fardown_offset * (1-ap_offset_factor_dist) + (nearup_offset - farup_offset) * ap_offset_factor_dist; 
+%             ap_move = floor(ap_position - apjitter) + fardown_offset * (1-ap_offset_factor_dist); % Changed from + apjitter to - apjitter 
+            end
         end
         % when the pole representation direction is changed from lateral to caudal 2016/07/02 JK
         % Changed to have 2 factors to compensate for touch angle
