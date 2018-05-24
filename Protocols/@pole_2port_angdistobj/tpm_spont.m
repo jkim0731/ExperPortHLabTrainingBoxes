@@ -1,5 +1,5 @@
-animal = '036';
-unit = '5554';
+animal = '056';
+unit = '5555';
 exp = '001';
 
 % set animal name after 'A'

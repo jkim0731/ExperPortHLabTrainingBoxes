@@ -272,10 +272,8 @@ switch action
                     next_pole_sign = 'm'; 
                     ap_offset_factor_dist = (next_pole_dist - value(far_dist)) / (value(near_dist) - value(far_dist));
                 elseif strcmp(TaskTarget, 'RadialDistance-Discrete')
-                    numDiscrete = 3;
-                    discrete_rand = linspace(0,0.5,numDiscrete);
-                    discrete_rand = [discrete_rand(1:numDiscrete-1), discrete_rand];
-                    rand_ind = ceil(rand*length(discrete_rand));
+                    discrete_rand = [0,0.25,0.5];
+                    rand_ind = ceil(rand*3);
                     if next_side == 'r'
                         next_pole_dist = value(far_dist) + discrete_rand(rand_ind) * (value(near_dist) - value(far_dist));
                     elseif next_side == 'l'
@@ -402,10 +400,8 @@ switch action
                     ap_offset_factor_dist = (next_pole_dist - value(far_dist)) / (value(near_dist) - value(far_dist));
 
                 elseif strcmp(TaskTarget, 'RadialDistance-Discrete')
-                    numDiscrete = 3;
-                    discrete_rand = linspace(0,0.5,numDiscrete);
-                    discrete_rand = [discrete_rand(1:numDiscrete-1), discrete_rand];
-                    rand_ind = ceil(rand*length(discrete_rand));
+                    discrete_rand = [0,0.25,0.5];
+                    rand_ind = ceil(rand*3);
                     if next_side == 'r'
                         next_pole_dist = value(far_dist) + discrete_rand(rand_ind) * (value(near_dist) - value(far_dist));
                     elseif next_side == 'l'
@@ -497,8 +493,8 @@ switch action
                 elseif strcmp(TaskTarget, 'RadialDistance-Discrete')
                     numDiscrete = 3;
                     discrete_rand = linspace(0,0.5,numDiscrete);
-                    discrete_rand = [discrete_rand(1:numDiscrete-1), discrete_rand];
-                    rand_ind = ceil(rand*length(discrete_rand));
+                    discrete_rand = [discrete_rand(1:[0,0.25,0.5];
+                    rand_ind = ceil(rand*3);
                     if next_side == 'r'
                         next_pole_dist = value(far_dist) + discrete_rand(rand_ind) * (value(near_dist) - value(far_dist));
                     elseif next_side == 'l'
@@ -522,8 +518,8 @@ switch action
                         next_pole_sign = 'l'; 
                     else
                         error('un-recognized type of choice (left or right)');
-                    end
-                    numDiscrete = 4;
+                    end                
+                    numDiscrete = 5;
                     discrete_rand = linspace(0,1,numDiscrete);
                     rand_ind = ceil(rand*numDiscrete);
                     next_pole_dist = value(far_dist) + round(discrete_rand(rand_ind)*(value(near_dist) - value(far_dist)));

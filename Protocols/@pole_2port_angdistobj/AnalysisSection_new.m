@@ -54,7 +54,7 @@ switch action
 
         % ---  Make new window for online analysis
         SoloParamHandle(obj, 'analysisfig', 'saveable', 0);
-        analysisfig.value = figure('Position', [1450 910 400 270], 'Menubar', 'none',...
+        analysisfig.value = figure('Position', [1450 900 400 200], 'Menubar', 'none',...
             'Toolbar', 'none','Name','Analysis','NumberTitle','off');
 
         x = 1; y = 1;
@@ -163,7 +163,7 @@ switch action
         nt =     [length(sL) ...
                   length(sR) ...
                   length(sN) ...
-                  length(previous_sides(1:end-1))];
+                  length(previous_sides(1:end-1)) - length(find(previous_sides(1:end-1)=='o'))];
         ntNI =     [length(sLNI) ...
                   length(sRNI) ...
                   length(sN) ...
@@ -212,36 +212,32 @@ switch action
         posbin_frac_correctLeft = nan*zeros(9,1);
         posbin_frac_correctRight = nan*zeros(9,1);        
 %         posbin = 0:20000:160000;
-        if length(previous_pole_ap_positions) > 1
-            noCatchTrialIndsSides = find(previous_sides(1:end-1) == 108 | 114);
-            noCatchTrialIndsAPposition = find(previous_sides(2:end-1) == 108 | 114)+1;
-            apPositions = previous_pole_ap_positions(noCatchTrialIndsAPposition);
-            sides = previous_sides(noCatchTrialIndsSides);
-            posbin = linspace(min(apPositions), max(apPositions),9);
+        if length(pole_ap_position_history) > 1
+            posbin = linspace(min(pole_ap_position_history(2:end)), max(pole_ap_position_history(2:end)),9);
             binDiff = round(mean(diff(posbin)));
             posbin_xvals = -4:4;
 
             for pb=1:9
                 if (pb == length(posbin))
-                    idxL = find(apPositions >= posbin(pb) & ...
-                               apPositions <= posbin(pb)+binDiff & ...
-                               previous_sides(1:end-1) == 'l'); % because previous_pole_ap_positions is not updated yet
-                    idxR = find(apPositions >= posbin(pb) & ...
-                               apPositions <= posbin(pb)+binDiff & ...
-                               previous_sides(1:end-1) == 'r');       
+                    idxL = find(pole_ap_position_history >= posbin(pb) & ...
+                               pole_ap_position_history <= posbin(pb)+binDiff & ...
+                               find(previous_sides == 'l'));
+                    idxR = find(pole_ap_position_history >= posbin(pb) & ...
+                               pole_ap_position_history <= posbin(pb)+binDiff & ...
+                               find(previous_sides == 'r'));       
                 else
-                    idxL = find(apPositions >= posbin(pb) & ...
-                               apPositions < posbin(pb)+binDiff & ...
-                               previous_sides(1:end-1) == 'l');
-                    idxR = find(apPositions >= posbin(pb) & ...
-                               apPositions < posbin(pb)+binDiff & ...
-                               previous_sides(1:end-1) == 'r');
+                    idxL = find(pole_ap_position_history >= posbin(pb) & ...
+                               pole_ap_position_history < posbin(pb)+binDiff & ...
+                               find(previous_sides == 'l'));
+                    idxR = find(pole_ap_position_history >= posbin(pb) & ...
+                               pole_ap_position_history < posbin(pb)+binDiff & ...
+                               find(previous_sides == 'r'));
                 end
                 posbin_countLeft(pb) = length(idxL);
                 posbin_countRight(pb) = length(idxR);
                 if ~isempty(idxL)
                     n_correctL = length(find(hit_history(idxL) == 1));
-                    posbin_frac_correctLeft(pb)= n_correctL/length(idxL); % for now miss will be calculated as wrong 2018/05/14 JK
+                    posbin_frac_correctLeft(pb)= n_correctL/length(idxL);
                 end
                 if ~isempty(idxR)
                     n_correctR = length(find(hit_history(idxR) == 1));
@@ -271,8 +267,7 @@ switch action
          %   
         %    plot([arange(1) arange(2)], [0.5 0.5], 'k:');
 
-%             previous_poscor_plot.value = [hb;hg];
-            previous_poscor_plot.value = [hb;hg];            
+            previous_poscor_plot.value = [hb;hg];
 
             drawnow;
         end
